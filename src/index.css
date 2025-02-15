@@ -1,0 +1,10 @@
+.form-container {
+  /* width: 70% !important; */
+  background-color: whitesmoke;
+  border: 1px solid #ccccccac;
+  box-shadow: 2px 1px 5px #ccc;
+}
+
+a {
+  text-decoration: none !important;
+}
