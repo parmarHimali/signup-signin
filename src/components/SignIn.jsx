@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 
 const SignIn = () => {
   const navigateTo = useNavigate();
-  const users = JSON.parse(localStorage.getItem("users-data"));
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -16,10 +15,10 @@ const SignIn = () => {
     },
     validate: (values) => {
       const err = {};
-      if (values.email === "") {
+      if (values.email.trim() === "") {
         err.email = "provide an email address";
       } else if (
-        !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(values.email)
+        !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(values.email)
       ) {
         err.email = "please provide valid email format";
       }
@@ -33,7 +32,7 @@ const SignIn = () => {
         const { data } = await axios.post(`${BASE_URL}/login`, values);
         localStorage.setItem("user", JSON.stringify(data.data));
         toast.success("User login successfully!");
-        navigateTo("/profile");
+        navigateTo("/");
       } catch (error) {
         toast.error("Invalid email or password");
         console.log(error);
@@ -55,10 +54,13 @@ const SignIn = () => {
               <Form.Group className="mb-2">
                 <Form.Label>Email:</Form.Label>
                 <Form.Control
-                  type="email"
+                  type="text"
                   size="sm"
                   value={formik.values.email}
-                  onChange={formik.handleChange}
+                  onChange={(e) =>
+                    formik.setFieldValue("email", e.target.value.trimStart())
+                  }
+                  onBlur={formik.handleBlur}
                   name="email"
                 />
                 {formik.errors.email && formik.touched.email && (
@@ -73,7 +75,10 @@ const SignIn = () => {
                   size="sm"
                   type="password"
                   value={formik.values.password}
-                  onChange={formik.handleChange}
+                  onChange={(e) =>
+                    formik.setFieldValue("password", e.target.value.trimStart())
+                  }
+                  onBlur={formik.handleBlur}
                   name="password"
                 />
                 {formik.errors.password && formik.touched.password && (
@@ -84,7 +89,7 @@ const SignIn = () => {
               </Form.Group>
               <div>
                 Don't have an account?
-                <Link className="ms-2" to="/">
+                <Link className="ms-2" to="/signup">
                   Sign Up
                 </Link>
               </div>

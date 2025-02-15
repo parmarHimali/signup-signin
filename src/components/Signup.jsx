@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import { data, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { BASE_URL } from "../App";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
@@ -19,11 +19,11 @@ const Signup = ({ users, setUsers }) => {
       img: null,
       city: "",
     },
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values, { resetForm, setFieldValue }) => {
       const formData = new FormData();
-      formData.append("username", values.username);
-      formData.append("email", values.email);
-      formData.append("password", values.password);
+      formData.append("username", values.username.trim());
+      formData.append("email", values.email.trim());
+      formData.append("password", values.password.trim());
       formData.append("phone", values.phone);
       formData.append("gender", values.gender);
       formData.append("terms_condition", values.terms_condition);
@@ -41,6 +41,7 @@ const Signup = ({ users, setUsers }) => {
         console.log(error);
       }
       resetForm();
+      setFieldValue("img", null);
     },
     validate: (values) => {
       const err = {};
@@ -64,7 +65,7 @@ const Signup = ({ users, setUsers }) => {
       if (values.email.trim() === "") {
         err.email = "Email is required!";
       } else if (
-        !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(values.email)
+        !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(values.email)
       ) {
         err.email = "please provide valid email format";
       }
@@ -87,6 +88,8 @@ const Signup = ({ users, setUsers }) => {
       }
       if (values.img == null) {
         err.img = "Please provide profile picture";
+      } else if (!values.img.type.includes("image/")) {
+        err.img = "Only image is required for profile.";
       }
       return err;
     },
@@ -108,7 +111,9 @@ const Signup = ({ users, setUsers }) => {
                   size="sm"
                   type="text"
                   value={formik.values.username}
-                  onChange={formik.handleChange}
+                  onChange={(e) =>
+                    formik.setFieldValue("username", e.target.value.trimStart())
+                  }
                   onBlur={formik.handleBlur}
                   name="username"
                 />
@@ -124,7 +129,9 @@ const Signup = ({ users, setUsers }) => {
                   size="sm"
                   type="email"
                   value={formik.values.email}
-                  onChange={formik.handleChange}
+                  onChange={(e) =>
+                    formik.setFieldValue("email", e.target.value.trimStart())
+                  }
                   onBlur={formik.handleBlur}
                   name="email"
                 />
@@ -156,7 +163,9 @@ const Signup = ({ users, setUsers }) => {
                   size="sm"
                   type="password"
                   value={formik.values.password}
-                  onChange={formik.handleChange}
+                  onChange={(e) =>
+                    formik.setFieldValue("password", e.target.value.trimStart())
+                  }
                   onBlur={formik.handleBlur}
                   name="password"
                 />
@@ -172,7 +181,12 @@ const Signup = ({ users, setUsers }) => {
                   size="sm"
                   type="password"
                   value={formik.values.confirmPswd}
-                  onChange={formik.handleChange}
+                  onChange={(e) =>
+                    formik.setFieldValue(
+                      "confirmPswd",
+                      e.target.value.trimStart()
+                    )
+                  }
                   name="confirmPswd"
                   onBlur={formik.handleBlur}
                 />
@@ -226,8 +240,13 @@ const Signup = ({ users, setUsers }) => {
                 >
                   <option value="">Select City</option>
                   <option value="Surat">Surat</option>
+                  <option value="Bhavnagar">Bhavnagar</option>
                   <option value="Ahemdabad">Ahemdabad</option>
+                  <option value="Vadodara">Vadodara</option>
                   <option value="Gandhinagar">Gandhinagar</option>
+                  <option value="Rajkot">Rajkot</option>
+                  <option value="Bharuch">Bharuch</option>
+                  <option value="Anand">Anand</option>
                 </Form.Select>
                 {formik.errors.city && formik.touched.city && (
                   <Form.Text className="text-danger">
@@ -248,7 +267,7 @@ const Signup = ({ users, setUsers }) => {
                   name="img"
                   accept="image/*"
                 />
-                {formik.errors.img && (
+                {formik.errors.img && formik.touched.img && (
                   <Form.Text className="text-danger">
                     {formik.errors.img}
                   </Form.Text>

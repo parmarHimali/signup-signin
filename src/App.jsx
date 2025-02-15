@@ -11,10 +11,8 @@ import axios from "axios";
 
 // export const BASE_URL = "http://192.168.29.178:3000";
 export const BASE_URL = "http://localhost:3000";
-// export const BASE_URL = "http://192.168.29.118:3000";
 const App = () => {
   const [users, setUsers] = useState([]);
-  // console.log(users);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -23,15 +21,16 @@ const App = () => {
     };
     fetchUsers();
   }, []);
+  console.log("All users:", users);
   return (
     <>
       <Routes>
         <Route
-          path="/"
+          path="/signup"
           element={<Signup setUsers={setUsers} users={users} />}
         />
         <Route path="/signin" element={<SignIn />} />
-        <Route path="/profile" Component={Profile} />
+        <Route path="/" Component={Profile} />
         <Route path="*" Component={NotFound} />
       </Routes>
       <ToastContainer />
