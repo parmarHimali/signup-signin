@@ -22,22 +22,28 @@ const SignIn = () => {
       ) {
         err.email = "please provide valid email format";
       }
+
       if (values.password.trim() == "") {
         err.password = "Password is required";
+      } else if (values.password.length < 6) {
+        err.password = "Password must contain atleast 6 characters";
       }
       return err;
     },
     onSubmit: async (values, { resetForm }) => {
       try {
+        console.log(values);
+
         const { data } = await axios.post(`${BASE_URL}/login`, values);
         localStorage.setItem("user", JSON.stringify(data.data));
         toast.success("User login successfully!");
+        resetForm();
         navigateTo("/");
       } catch (error) {
-        toast.error("Invalid email or password");
+        toast.error(error.response.data.errorMessage || "Login failed!");
+        resetForm();
         console.log(error);
       }
-      resetForm();
     },
   });
 

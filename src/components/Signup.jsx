@@ -1,12 +1,13 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../App";
 import { useFormik } from "formik";
 import { toast } from "react-toastify";
 
 const Signup = ({ users, setUsers }) => {
+  const navigateTo = useNavigate();
   const formik = useFormik({
     initialValues: {
       username: "",
@@ -41,6 +42,7 @@ const Signup = ({ users, setUsers }) => {
         console.log(error);
       }
       resetForm();
+      navigateTo("/signin");
       setFieldValue("img", null);
     },
     validate: (values) => {
@@ -48,6 +50,12 @@ const Signup = ({ users, setUsers }) => {
 
       if (values.username.trim() == "") {
         err.username = "Username is required";
+      } else if (!/^[A-Za-z ]+$/.test(values.username)) {
+        err.username = "Username can only contain alphabets";
+      } else if (values.username.length < 2) {
+        err.username = "Username must contain atleast 2 characters";
+      } else if (values.username.length > 50) {
+        err.username = "Username cannot exceed 50 characters";
       }
 
       if (values.password.trim() == "") {
@@ -68,13 +76,17 @@ const Signup = ({ users, setUsers }) => {
         !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(values.email)
       ) {
         err.email = "please provide valid email format";
+      } else if (users.some((user) => user.email == values.email)) {
+        err.email = "Email already exists!";
       }
-
       if (values.phone === "") {
         err.phone = "provide phone number";
       } else if (!/^\d{10}$/.test(values.phone)) {
         err.phone = "provide 10 digits phone number";
+      } else if (users.some((user) => user.phone == values.phone)) {
+        err.phone = "Phone number already exists!";
       }
+
       if (values.gender === "") {
         err.gender = "Please select gender";
       }
@@ -116,6 +128,7 @@ const Signup = ({ users, setUsers }) => {
                   }
                   onBlur={formik.handleBlur}
                   name="username"
+                  maxLength={50}
                 />
                 {formik.errors.username && formik.touched.username && (
                   <Form.Text className="text-danger">

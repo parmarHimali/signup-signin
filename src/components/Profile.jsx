@@ -12,7 +12,6 @@ const Profile = () => {
   const navigateTo = useNavigate();
   useEffect(() => {
     if (!user) {
-      // toast.error("Login is required");
       navigateTo("/signin");
     }
   }, []);
